@@ -3,45 +3,27 @@ package com.unimag.sistemadevotacion
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.unimag.sistemadevotacion.ui.theme.SistemaDeVotacionTheme
+import com.unimag.sistemadevotacion.ui.WelcomeScreen
+import com.unimag.sistemadevotacion.ui.AppNavigation
+
 
 class MainActivity : ComponentActivity() {
+
+    enum class Screen { WELCOME, CONTRALOR, PERSONERO, CONFIRMATION, ADMIN }
+
+    private var currentScreen by mutableStateOf(Screen.WELCOME)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             SistemaDeVotacionTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                AppNavigation(applicationContext)
             }
         }
-    }
-}
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    SistemaDeVotacionTheme {
-        Greeting("Android")
     }
 }
