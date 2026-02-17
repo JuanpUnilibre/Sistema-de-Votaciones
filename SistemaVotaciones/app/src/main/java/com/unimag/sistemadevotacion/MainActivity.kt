@@ -13,10 +13,6 @@ import com.unimag.sistemadevotacion.ui.AppNavigation
 
 class MainActivity : ComponentActivity() {
 
-    enum class Screen { WELCOME, CONTRALOR, PERSONERO, CONFIRMATION, ADMIN }
-
-    private var currentScreen by mutableStateOf(Screen.WELCOME)
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {

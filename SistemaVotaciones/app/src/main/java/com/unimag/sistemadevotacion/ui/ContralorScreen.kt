@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.unimag.sistemadevotacion.R
 import com.unimag.sistemadevotacion.data.Candidate
+import com.unimag.sistemadevotacion.data.Role
 import com.unimag.sistemadevotacion.data.VoteState
 
 @Composable
@@ -35,7 +36,7 @@ fun ContralorScreen(navController: NavHostController, candidates: List<Candidate
 
         // lista de candidatos (3)
         Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            candidates.filter { it.role == "contralor" }.forEach { c ->
+            candidates.filter { it.role == Role.CONTRALOR }.forEach { c ->
                 val isSelected = selectedId == c.id
                 Row(
                     modifier = Modifier

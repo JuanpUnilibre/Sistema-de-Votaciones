@@ -60,7 +60,7 @@ fun WelcomeScreen(navController: NavController ) {
 
             // Boton votar
             Button(
-                onClick = { navController.navigate("vote") },
+                onClick = { navController.navigate("contralor") },
                 modifier = Modifier.width(200.dp)
             ) {
                 Text("Comencemos")

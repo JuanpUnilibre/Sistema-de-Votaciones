@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.unimag.sistemadevotacion.data.Candidate
 import com.unimag.sistemadevotacion.data.VoteManager
+import com.unimag.sistemadevotacion.data.Role
+
 
 @Composable
 fun AdminScreen(candidates: List<Candidate>, voteManager: VoteManager) {
@@ -17,7 +19,7 @@ fun AdminScreen(candidates: List<Candidate>, voteManager: VoteManager) {
         Spacer(modifier = Modifier.height(12.dp))
 
         Text("CONTRALOR", style = MaterialTheme.typography.titleMedium)
-        val contralores = candidates.filter { it.role == "contralor" }
+        val contralores = candidates.filter { it.role == Role.CONTRALOR }
         LazyColumn {
             items(contralores) { c ->
                 Row(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -29,7 +31,7 @@ fun AdminScreen(candidates: List<Candidate>, voteManager: VoteManager) {
 
         Spacer(modifier = Modifier.height(12.dp))
         Text("PERSONERO", style = MaterialTheme.typography.titleMedium)
-        val personeros = candidates.filter { it.role == "personero" }
+        val personeros = candidates.filter { it.role == Role.PERSONERO }
         LazyColumn {
             items(personeros) { c ->
                 Row(modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -52,7 +54,3 @@ fun AdminScreen(candidates: List<Candidate>, voteManager: VoteManager) {
         }
     }
 }
-
-
-
-

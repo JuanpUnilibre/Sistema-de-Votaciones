@@ -14,6 +14,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.unimag.sistemadevotacion.data.Candidate
+import com.unimag.sistemadevotacion.data.Role
 import com.unimag.sistemadevotacion.data.VoteManager
 import com.unimag.sistemadevotacion.data.VoteState
 
@@ -32,7 +33,7 @@ fun PersoneroScreen(navController: NavHostController, candidates: List<Candidate
         Spacer(modifier = Modifier.height(16.dp))
 
         Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            candidates.filter { it.role == "personero" }.forEach { c ->
+            candidates.filter { it.role == Role.PERSONERO }.forEach { c ->
                 val isSelected = selectedId == c.id
                 Row(
                     modifier = Modifier
