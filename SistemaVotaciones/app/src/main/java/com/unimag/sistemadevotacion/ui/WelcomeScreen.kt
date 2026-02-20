@@ -2,30 +2,37 @@ package com.unimag.sistemadevotacion.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
-import androidx.compose.material3.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.unimag.sistemadevotacion.R
 
-
+/**
+ * WelcomeScreen es la pantalla de bienvenida de la aplicación.
+ *
+ * @param navController El NavController para gestionar la navegación.
+ */
 @Composable
-fun WelcomeScreen(navController: NavController ) {
+fun WelcomeScreen(navController: NavController) {
 
+    // Box se usa como contenedor raíz para poder posicionar elementos con align.
+    // safeDrawingPadding() añade un relleno automático para evitar que el contenido
+    // se solape con las barras del sistema (barra de estado, barra de navegación, etc.).
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .safeDrawingPadding()
     ) {
 
-        // Boton admin arriba derecha
+        // Botón para ir a la pantalla de PIN de administrador, alineado arriba a la derecha.
         IconButton(
-            onClick = { navController.navigate("admin") },
+            onClick = { navController.navigate("pin") },
             modifier = Modifier.align(Alignment.TopEnd)
         ) {
             Icon(
@@ -34,31 +41,34 @@ fun WelcomeScreen(navController: NavController ) {
             )
         }
 
-        // Contenido centrado
+        // Columna para centrar el contenido principal vertical y horizontalmente.
         Column(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // Logo colegio
+            // Muestra el logo del colegio.
             Image(
                 painter = painterResource(id = R.drawable.ic_school_logo),
-                contentDescription = "Logo",
+                contentDescription = "Logo del Colegio",
                 modifier = Modifier.size(150.dp)
             )
 
+            // Espaciador vertical.
             Spacer(modifier = Modifier.height(20.dp))
 
-            // Titulo
+            // Título de la aplicación, usando el estilo definido en el tema.
             Text(
                 text = "Sistema de Votaciones",
-                fontSize = 26.sp
+               style = MaterialTheme.typography.titleLarge
             )
 
+            // Espaciador vertical.
             Spacer(modifier = Modifier.height(30.dp))
 
-            // Boton votar
+            // Botón para iniciar el proceso de votación.
+            // Navega a la pantalla de "contralor".
             Button(
                 onClick = { navController.navigate("contralor") },
                 modifier = Modifier.width(200.dp)
