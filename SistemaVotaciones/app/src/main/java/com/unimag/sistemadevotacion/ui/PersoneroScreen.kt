@@ -107,35 +107,49 @@ fun PersoneroScreen(navController: NavHostController, candidates: List<Candidate
             Text(text = "VOTO EN BLANCO", style = MaterialTheme.typography.titleMedium)
         }
 
-        // Spacer que empuja el botón de confirmación hacia abajo.
+        // Spacer que empuja los botones de confirmación hacia abajo.
         Spacer(modifier = Modifier.weight(1f))
 
-        // Botón para confirmar y registrar el voto.
-        Button(
-            onClick = {
-                // Se guardan los votos para el contralor y el personero seleccionados.
-                VoteState.selectedContralorId?.let { voteManager.addVote(it) }
-                VoteState.selectedPersoneroId?.let { voteManager.addVote(it) }
-                // Se registra que un votante ha completado el proceso.
-                voteManager.incrementTotalVotantes()
-                // Se marca que este usuario ya ha votado.
-                voteManager.setHasVoted(true)
-                // Se resetea el estado de la votación actual para el siguiente votante.
-                VoteState.reset()
-                // Se navega a la pantalla de confirmación.
-                navController.navigate("confirmation") {
-                    // Limpia la pila de navegación hasta la pantalla de bienvenida
-                    // para que el usuario no pueda volver atrás a las pantallas de votación.
-                    popUpTo("welcome")
-                }
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            // El botón solo se activa si se ha seleccionado un personero o el voto en blanco.
-            enabled = selectedId != null
+        // Fila para los botones de navegación (anterior y confirmar).
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text("CONFIRMAR VOTO")
+            // Botón para volver a la pantalla anterior (Contralor).
+            Button(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(56.dp)
+            ) {
+                Text("ANTERIOR")
+            }
+
+            // Botón para confirmar y registrar el voto.
+            Button(
+                onClick = {
+                    // Se guardan los votos para el contralor y el personero seleccionados.
+                    VoteState.selectedContralorId?.let { voteManager.addVote(it) }
+                    VoteState.selectedPersoneroId?.let { voteManager.addVote(it) }
+                    // Se registra que un votante ha completado el proceso.
+                    voteManager.incrementTotalVotantes()
+                    // Se marca que este usuario ya ha votado.
+                    voteManager.setHasVoted(true)
+                    // Se resetea el estado de la votación actual para el siguiente votante.
+                    VoteState.reset()
+                    // Se navega a la pantalla de confirmación.
+                    navController.navigate("confirmation") {
+                        popUpTo("welcome")
+                    }
+                },
+                modifier = Modifier
+                    .weight(1f)
+                    .height(56.dp),
+                // El botón solo se activa si se ha seleccionado un personero o el voto en blanco.
+                enabled = selectedId != null
+            ) {
+                Text("CONFIRMAR VOTO")
+            }
         }
     }
 }

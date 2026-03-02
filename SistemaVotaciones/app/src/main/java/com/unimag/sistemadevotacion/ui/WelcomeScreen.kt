@@ -78,3 +78,4 @@ fun WelcomeScreen(navController: NavController) {
         }
     }
 }
+
