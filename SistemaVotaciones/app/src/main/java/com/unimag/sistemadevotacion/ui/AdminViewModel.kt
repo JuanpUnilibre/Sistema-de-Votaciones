@@ -52,7 +52,8 @@ class AdminViewModel : ViewModel() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            val resultsByRole = Role.values().map { role ->
+            // Usamos entries en lugar de values() para mayor modernidad en Kotlin
+            val resultsByRole = Role.entries.map { role ->
                 processRoleResults(role, voteManager, allCandidates)
             }
 
@@ -78,6 +79,7 @@ class AdminViewModel : ViewModel() {
             .maxByOrNull { voteManager.getVotes(it.id) }
             ?.let { leader ->
                 val leaderVotes = voteManager.getVotes(leader.id)
+                // Solo hay líder si no hay empate en el primer puesto
                 if (candidatesInRole.count { voteManager.getVotes(it.id) == leaderVotes } == 1) leader.id else null
             }
 
@@ -88,6 +90,7 @@ class AdminViewModel : ViewModel() {
         }
 
         val blankPercentage = if (totalVotesInRole > 0) (blankVotes.toFloat() / totalVotesInRole) * 100f else 0f
+        // El voto en blanco se añade como un candidato más para la visualización
         val blankResult = CandidateResult(blankVoteId, "VOTO EN BLANCO", 0, blankVotes, blankPercentage, false)
 
         return RoleResult(role, candidateResults + blankResult, totalVotesInRole)
@@ -112,7 +115,9 @@ class AdminViewModel : ViewModel() {
                     out.write("role,candidateId,name,votes,percent,timestamp\n")
                     _uiState.value.roleResults.forEach { roleResult ->
                         roleResult.candidates.forEach { candidate ->
-                            val line = "${roleResult.role},${candidate.id},${candidate.name.replace(",", "")},${candidate.votes},${String.format("%.2f", candidate.percentage)},$timestamp\n"
+                            // Usamos String.format con Locale explícito para evitar advertencias
+                            val formattedPercent = String.format(Locale.getDefault(), "%.2f", candidate.percentage)
+                            val line = "${roleResult.role},${candidate.id},${candidate.name.replace(",", "")},${candidate.votes},$formattedPercent,$timestamp\n"
                             out.write(line)
                         }
                     }

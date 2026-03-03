@@ -19,10 +19,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -30,10 +34,11 @@ import com.unimag.sistemadevotacion.R
 import com.unimag.sistemadevotacion.data.Candidate
 import com.unimag.sistemadevotacion.data.Role
 import com.unimag.sistemadevotacion.data.VoteManager
-import com.unimag.sistemadevotacion.ui.theme.PrimaryRed
-import com.unimag.sistemadevotacion.ui.theme.SecondaryYellow
-import com.unimag.sistemadevotacion.ui.theme.SuccessGreen
+import com.unimag.sistemadevotacion.ui.theme.ToxicGreen
+import com.unimag.sistemadevotacion.ui.theme.ToxicGreenDark
+import com.unimag.sistemadevotacion.ui.theme.ToxicGreenLight
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -51,7 +56,6 @@ fun AdminDashboardScreen(
         adminViewModel.loadResults(voteManager, candidates)
     }
 
-    // Observa los mensajes de Snackbar del ViewModel
     LaunchedEffect(uiState.snackbarMessage) {
         uiState.snackbarMessage?.let {
             scope.launch {
@@ -88,7 +92,7 @@ fun AdminDashboardScreen(
                         )
                         DropdownMenuItem(
                             text = { Text("Reiniciar Votos") },
-                            onClick = { /* TODO */ }
+                            onClick = { /* TODO: Implementar reset con PIN */ showMenu = false }
                         )
                     }
                 },
@@ -98,15 +102,30 @@ fun AdminDashboardScreen(
             )
         }
     ) { paddingValues ->
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 350.dp),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(8.dp)
-        ) {
-            items(uiState.roleResults) { roleResult ->
-                RoleSection(result = roleResult)
+        Column(modifier = Modifier.padding(paddingValues)) {
+            // Muestra el total de votantes de forma destacada
+            Surface(
+                color = MaterialTheme.colorScheme.primaryContainer,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "TOTAL PERSONAS QUE HAN VOTADO: ${uiState.totalVotantes}",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(12.dp),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            }
+
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 350.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp)
+            ) {
+                items(uiState.roleResults) { roleResult ->
+                    RoleSection(result = roleResult)
+                }
             }
         }
     }
@@ -120,14 +139,23 @@ fun RoleSection(result: RoleResult) {
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = if (result.role == Role.CONTRALOR) "CONTRALOR" else "PERSONERO",
-                style = MaterialTheme.typography.titleLarge
-            )
-            Text(
-                text = "${result.totalVotesInRole} Votos Totales",
-                style = MaterialTheme.typography.labelMedium
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = if (result.role == Role.CONTRALOR) "CONTRALOR" else "PERSONERO",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = ToxicGreenDark
+                )
+                Text(
+                    text = "${result.totalVotesInRole} Votos",
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+            
             Spacer(modifier = Modifier.height(16.dp))
 
             result.candidates.forEach {
@@ -147,7 +175,7 @@ fun CandidateCard(candidate: CandidateResult) {
     )
 
     val borderModifier = if (candidate.isLeader) {
-        Modifier.border(2.dp, SuccessGreen, RoundedCornerShape(16.dp))
+        Modifier.border(2.dp, ToxicGreenDark, RoundedCornerShape(16.dp))
     } else {
         Modifier
     }
@@ -160,7 +188,7 @@ fun CandidateCard(candidate: CandidateResult) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Image(
                 painter = painterResource(id = if (candidate.imageRes != 0) candidate.imageRes else R.drawable.ic_school_logo),
-                contentDescription = "Imagen de ${candidate.name}",
+                contentDescription = null,
                 modifier = Modifier
                     .size(72.dp)
                     .clip(CircleShape)
@@ -170,21 +198,38 @@ fun CandidateCard(candidate: CandidateResult) {
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                Text(candidate.name, style = MaterialTheme.typography.titleMedium)
+                // Nombre del candidato - [cantidad votos] votos
+                val annotatedText = buildAnnotatedString {
+                    append(candidate.name)
+                    append(" - ")
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.ExtraBold, fontSize = 20.sp, color = ToxicGreenDark)) {
+                        append("${candidate.votes}")
+                    }
+                    append(" votos")
+                }
+                
+                Text(text = annotatedText, style = MaterialTheme.typography.titleMedium)
+                
                 Spacer(modifier = Modifier.height(4.dp))
-                Text("${candidate.votes} Votos (${String.format("%.1f", candidate.percentage)}%)", style = MaterialTheme.typography.bodyLarge)
+                
+                Text(
+                    text = "${String.format(Locale.getDefault(), "%.1f", candidate.percentage)}%", 
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+                
                 Spacer(modifier = Modifier.height(8.dp))
 
                 // Barra de Progreso
-                Box(modifier = Modifier.fillMaxWidth().height(20.dp).clip(RoundedCornerShape(10.dp)).background(MaterialTheme.colorScheme.surfaceVariant)) {
+                Box(modifier = Modifier.fillMaxWidth().height(16.dp).clip(RoundedCornerShape(8.dp)).background(MaterialTheme.colorScheme.surfaceVariant)) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth(animatedProgress)
-                            .height(20.dp)
-                            .clip(RoundedCornerShape(10.dp))
+                            .height(16.dp)
+                            .clip(RoundedCornerShape(8.dp))
                             .background(
                                 brush = Brush.horizontalGradient(
-                                    colors = listOf(PrimaryRed, SecondaryYellow)
+                                    colors = listOf(ToxicGreen, ToxicGreenLight)
                                 )
                             )
                     )
@@ -193,15 +238,18 @@ fun CandidateCard(candidate: CandidateResult) {
 
             if (candidate.isLeader) {
                 Box(modifier = Modifier.padding(start = 8.dp)) {
-                    Text(
-                        text = "LÍDER",
-                        color = SuccessGreen,
-                        fontWeight = FontWeight.ExtraBold,
-                        fontSize = 12.sp,
-                        modifier = Modifier
-                            .background(SuccessGreen.copy(alpha = 0.1f), CircleShape)
-                            .padding(horizontal = 8.dp, vertical = 4.dp)
-                    )
+                    Surface(
+                        color = ToxicGreen,
+                        shape = CircleShape
+                    ) {
+                        Text(
+                            text = "LÍDER",
+                            color = Color.Black,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 10.sp,
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
                 }
             }
         }

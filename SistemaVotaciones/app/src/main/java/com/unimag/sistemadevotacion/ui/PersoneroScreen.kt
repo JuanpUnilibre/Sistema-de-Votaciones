@@ -4,152 +4,217 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.unimag.sistemadevotacion.R
 import com.unimag.sistemadevotacion.data.Candidate
 import com.unimag.sistemadevotacion.data.Role
 import com.unimag.sistemadevotacion.data.VoteManager
 import com.unimag.sistemadevotacion.data.VoteState
 
-/**
- * PersoneroScreen es la pantalla donde el usuario selecciona un candidato para el rol de Personero.
- *
- * @param navController El NavHostController para gestionar la navegación.
- * @param candidates La lista completa de todos los candidatos.
- * @param voteManager La instancia de VoteManager para registrar los votos.
- */
 @Composable
 fun PersoneroScreen(navController: NavHostController, candidates: List<Candidate>, voteManager: VoteManager) {
-    // `selectedId` mantiene el ID del candidato a personero seleccionado.
-    // Se inicializa con el valor guardado en VoteState para mantener la selección si el usuario vuelve atrás.
     var selectedId by remember { mutableStateOf(VoteState.selectedPersoneroId) }
+    var showDialog by remember { mutableStateOf(false) }
+    val selectedCandidate = candidates.find { it.id == selectedId }
+    val successColor = Color(0xFF00C389)
 
-    // Columna principal que organiza los elementos verticalmente.
-    // safeDrawingPadding() añade un relleno automático para respetar las barras del sistema.
     Column(
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
-            .padding(16.dp),
+            .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Título de la pantalla.
-        Text(text = "Seleccione al PERSONERO", style = MaterialTheme.typography.titleLarge)
+        Text(
+            text = "Seleccione al PERSONERO", 
+            style = MaterialTheme.typography.titleLarge,
+            fontSize = 30.sp
+        )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(32.dp))
 
-        // Columna para la lista de candidatos.
-        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-            // Filtra la lista de candidatos para mostrar solo los que tienen el rol de PERSONERO.
+        Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(20.dp)) {
             candidates.filter { it.role == Role.PERSONERO }.forEach { candidate ->
                 val isSelected = selectedId == candidate.id
-                // Fila que representa a un candidato.
+                
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        // El borde cambia si el candidato está seleccionado.
                         .border(
-                            width = if (isSelected) 3.dp else 1.dp,
-                            color = if (isSelected) MaterialTheme.colorScheme.primary else Color.LightGray,
-                            shape = RoundedCornerShape(8.dp)
+                            width = if (isSelected) 5.dp else 1.dp,
+                            color = if (isSelected) successColor else Color.LightGray,
+                            shape = RoundedCornerShape(16.dp)
                         )
-                        // Permite seleccionar al candidato al hacer clic.
                         .clickable {
-                            selectedId = candidate.id
-                            VoteState.selectedPersoneroId = candidate.id
+                            if (isSelected) {
+                                showDialog = true
+                            } else {
+                                selectedId = candidate.id
+                                VoteState.selectedPersoneroId = candidate.id
+                            }
                         }
-                        .padding(12.dp),
+                        .padding(20.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Imagen del candidato.
                     Image(
                         painter = painterResource(id = candidate.imageRes),
                         contentDescription = candidate.name,
-                        modifier = Modifier.size(72.dp)
+                        modifier = Modifier.size(90.dp).clip(CircleShape)
                     )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    // Nombre y rol del candidato.
-                    Column {
-                        Text(text = candidate.name, style = MaterialTheme.typography.titleMedium)
-                        Text(text = "Candidato", style = MaterialTheme.typography.bodySmall)
+                    Spacer(modifier = Modifier.width(20.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = candidate.name, 
+                            style = MaterialTheme.typography.titleMedium,
+                            fontSize = 24.sp
+                        )
+                        Text(text = "Candidato", style = MaterialTheme.typography.bodySmall, fontSize = 14.sp)
+                    }
+
+                    if (isSelected) {
+                        Surface(
+                            color = successColor,
+                            shape = RoundedCornerShape(20.dp),
+                            modifier = Modifier.padding(start = 8.dp)
+                        ) {
+                            Text(
+                                text = "VOTAR",
+                                color = Color.White,
+                                fontWeight = FontWeight.ExtraBold,
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
+                            )
+                        }
                     }
                 }
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
-        // Opción para Voto en Blanco
-        val isVotoEnBlancoSelected = selectedId == VoteState.PERSONERO_BLANCO_ID
+        // Opción Voto en Blanco
+        val isBlancoSelected = selectedId == VoteState.PERSONERO_BLANCO_ID
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .border(
-                    width = if (isVotoEnBlancoSelected) 3.dp else 1.dp,
-                    color = if (isVotoEnBlancoSelected) MaterialTheme.colorScheme.primary else Color.LightGray,
-                    shape = RoundedCornerShape(8.dp)
+                    width = if (isBlancoSelected) 5.dp else 1.dp,
+                    color = if (isBlancoSelected) successColor else Color.LightGray,
+                    shape = RoundedCornerShape(16.dp)
                 )
                 .clickable {
-                    selectedId = VoteState.PERSONERO_BLANCO_ID
-                    VoteState.selectedPersoneroId = VoteState.PERSONERO_BLANCO_ID
+                    if (isBlancoSelected) {
+                        showDialog = true
+                    } else {
+                        selectedId = VoteState.PERSONERO_BLANCO_ID
+                        VoteState.selectedPersoneroId = VoteState.PERSONERO_BLANCO_ID
+                    }
                 }
-                .padding(vertical = 20.dp),
+                .padding(24.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
         ) {
-            Text(text = "VOTO EN BLANCO", style = MaterialTheme.typography.titleMedium)
+            Text(text = "VOTO EN BLANCO", style = MaterialTheme.typography.titleMedium, fontSize = 22.sp)
+            if (isBlancoSelected) {
+                Spacer(modifier = Modifier.width(20.dp))
+                Surface(
+                    color = successColor,
+                    shape = RoundedCornerShape(20.dp)
+                ) {
+                    Text(
+                        text = "VOTAR",
+                        color = Color.White,
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 16.sp,
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
+                    )
+                }
+            }
         }
 
-        // Spacer que empuja los botones de confirmación hacia abajo.
         Spacer(modifier = Modifier.weight(1f))
 
-        // Fila para los botones de navegación (anterior y confirmar).
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            // Botón para volver a la pantalla anterior (Contralor).
-            Button(
-                onClick = { navController.popBackStack() },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(56.dp)
-            ) {
-                Text("ANTERIOR")
-            }
-
-            // Botón para confirmar y registrar el voto.
-            Button(
-                onClick = {
-                    // Se guardan los votos para el contralor y el personero seleccionados.
-                    VoteState.selectedContralorId?.let { voteManager.addVote(it) }
-                    VoteState.selectedPersoneroId?.let { voteManager.addVote(it) }
-                    // Se registra que un votante ha completado el proceso.
-                    voteManager.incrementTotalVotantes()
-                    // Se marca que este usuario ya ha votado.
-                    voteManager.setHasVoted(true)
-                    // Se resetea el estado de la votación actual para el siguiente votante.
-                    VoteState.reset()
-                    // Se navega a la pantalla de confirmación.
-                    navController.navigate("confirmation") {
-                        popUpTo("welcome")
-                    }
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .height(56.dp),
-                // El botón solo se activa si se ha seleccionado un personero o el voto en blanco.
-                enabled = selectedId != null
-            ) {
-                Text("CONFIRMAR VOTO")
-            }
+        TextButton(onClick = { navController.popBackStack() }) {
+            Text("VOLVER AL ANTERIOR", color = Color.Gray, fontSize = 16.sp)
         }
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = {
+                Text(
+                    text = "Confirmar Voto",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+            },
+            text = {
+                Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
+                    Image(
+                        painter = painterResource(id = selectedCandidate?.imageRes ?: R.drawable.ic_school_logo),
+                        contentDescription = null,
+                        modifier = Modifier.size(140.dp).clip(CircleShape)
+                    )
+                    Spacer(modifier = Modifier.height(20.dp))
+                    Text(
+                        text = "¿Este es el personero por el que quieres votar, cierto?",
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontSize = 18.sp,
+                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                    )
+                    Text(
+                        text = if (selectedId != VoteState.PERSONERO_BLANCO_ID) (selectedCandidate?.name ?: "") else "VOTO EN BLANCO",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 24.sp,
+                        modifier = Modifier.padding(top = 12.dp)
+                    )
+                }
+            },
+            confirmButton = {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    OutlinedButton(
+                        onClick = { showDialog = false },
+                        modifier = Modifier.height(60.dp).weight(1f).padding(horizontal = 8.dp)
+                    ) {
+                        Text("NO", color = Color.Gray, fontSize = 20.sp)
+                    }
+                    Button(
+                        onClick = {
+                            showDialog = false
+                            // REGISTRO DE VOTOS
+                            VoteState.selectedContralorId?.let { voteManager.addVote(it) }
+                            VoteState.selectedPersoneroId?.let { voteManager.addVote(it) }
+                            voteManager.incrementTotalVotantes()
+                            VoteState.reset()
+                            
+                            navController.navigate("confirmation") {
+                                popUpTo("welcome")
+                            }
+                        },
+                        modifier = Modifier.height(60.dp).weight(1f).padding(horizontal = 8.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = successColor)
+                    ) {
+                        Text("¡SÍ!", fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+                    }
+                }
+            }
+        )
     }
 }

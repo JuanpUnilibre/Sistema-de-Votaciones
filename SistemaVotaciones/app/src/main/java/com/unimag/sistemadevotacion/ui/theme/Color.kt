@@ -2,26 +2,26 @@ package com.unimag.sistemadevotacion.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Paleta de colores vibrante para el nuevo dashboard
-val PrimaryRed = Color(0xFFFF6B6B)
-val SecondaryYellow = Color(0xFFFFD93D)
-val TertiaryBlue = Color(0xFF4D96FF)
-val SuccessGreen = Color(0xFF00C389)
+// --- Paleta "Verde Tóxico" ---
+val ToxicGreen = Color(0xFF39FF14)      // Verde neón principal
+val ToxicGreenDark = Color(0xFF2ECC71)  // Un verde más profundo para contrastes
+val ToxicGreenLight = Color(0xFFB3FFB3) // Un verde muy suave para fondos o detalles
 
-// Colores para el tema claro
-val LightBackground = Color(0xFFF7F7F7) // Un blanco limpio
-val LightSurface = Color.White
-val LightOnPrimary = Color.White
-val LightOnSecondary = Color.Black
-val LightOnTertiary = Color.White
-val LightOnBackground = Color.Black
-val LightOnSurface = Color.Black
+// Colores de soporte
+val PureWhite = Color(0xFFFFFFFF)
+val ErrorRed = Color(0xFFFF3131)        // Rojo vibrante para errores
+val DarkGrey = Color(0xFF121212)
 
-// Colores para el tema oscuro (puedes ajustarlos si quieres un tema oscuro)
-val DarkBackground = Color(0xFF1A1A1A) // Un negro elegante
-val DarkSurface = Color(0xFF2C2C2C)
-val DarkOnPrimary = Color.White
-val DarkOnSecondary = Color.Black
-val DarkOnTertiary = Color.White
-val DarkOnBackground = Color.White
-val DarkOnSurface = Color.White
+// Mapeo para el sistema de Material3
+val LightPrimary = ToxicGreen
+val LightOnPrimary = Color.Black        // El verde tóxico brilla más con texto negro
+val LightSecondary = ToxicGreenDark
+val LightBackground = PureWhite
+val LightSurface = PureWhite
+val LightError = ErrorRed
+
+val DarkPrimary = ToxicGreen
+val DarkOnPrimary = Color.Black
+val DarkBackground = DarkGrey
+val DarkSurface = Color(0xFF1E1E1E)
+val DarkError = ErrorRed
