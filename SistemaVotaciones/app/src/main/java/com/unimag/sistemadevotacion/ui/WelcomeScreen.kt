@@ -10,6 +10,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.unimag.sistemadevotacion.R
 
@@ -22,8 +23,6 @@ import com.unimag.sistemadevotacion.R
 fun WelcomeScreen(navController: NavController) {
 
     // Box se usa como contenedor raíz para poder posicionar elementos con align.
-    // safeDrawingPadding() añade un relleno automático para evitar que el contenido
-    // se solape con las barras del sistema (barra de estado, barra de navegación, etc.).
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -48,11 +47,12 @@ fun WelcomeScreen(navController: NavController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // Muestra el logo del colegio.
+            // Muestra el nuevo logo de la aplicación.
+            // Usamos la versión de primer plano (foreground) del nuevo icono.
             Image(
-                painter = painterResource(id = R.drawable.ic_school_logo),
+                painter = painterResource(id = R.mipmap.ic_launcher_foreground),
                 contentDescription = "Logo del Colegio",
-                modifier = Modifier.size(150.dp)
+                modifier = Modifier.size(180.dp) // Lo hacemos un poco más grande para que luzca
             )
 
             // Espaciador vertical.
@@ -61,7 +61,7 @@ fun WelcomeScreen(navController: NavController) {
             // Título de la aplicación, usando el estilo definido en el tema.
             Text(
                 text = "Sistema de Votaciones",
-               style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleLarge
             )
 
             // Espaciador vertical.
@@ -78,4 +78,3 @@ fun WelcomeScreen(navController: NavController) {
         }
     }
 }
-

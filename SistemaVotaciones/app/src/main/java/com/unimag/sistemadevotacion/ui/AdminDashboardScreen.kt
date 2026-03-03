@@ -48,9 +48,9 @@ fun AdminDashboardScreen(
     adminViewModel: AdminViewModel = viewModel()
 ) {
     val uiState by adminViewModel.uiState.collectAsState()
-    val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    var showResetDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = true) {
         adminViewModel.loadResults(voteManager, candidates)
@@ -84,15 +84,11 @@ fun AdminDashboardScreen(
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Exportar CSV") },
-                            onClick = {
-                                adminViewModel.exportToCsv(context, candidates)
-                                showMenu = false
-                            }
-                        )
-                        DropdownMenuItem(
                             text = { Text("Reiniciar Votos") },
-                            onClick = { /* TODO: Implementar reset con PIN */ showMenu = false }
+                            onClick = { 
+                                showResetDialog = true
+                                showMenu = false 
+                            }
                         )
                     }
                 },
@@ -103,7 +99,6 @@ fun AdminDashboardScreen(
         }
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
-            // Muestra el total de votantes de forma destacada
             Surface(
                 color = MaterialTheme.colorScheme.primaryContainer,
                 modifier = Modifier.fillMaxWidth()
@@ -128,6 +123,31 @@ fun AdminDashboardScreen(
                 }
             }
         }
+    }
+
+    // Alerta de confirmación antes de resetear
+    if (showResetDialog) {
+        AlertDialog(
+            onDismissRequest = { showResetDialog = false },
+            title = { Text("¡Cuidado!") },
+            text = { Text("¿Estás seguro de que quieres borrar todos los votos? Esta acción no se puede deshacer.") },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        adminViewModel.resetVotes(voteManager, candidates)
+                        showResetDialog = false
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("SÍ, REINICIAR", color = Color.White)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showResetDialog = false }) {
+                    Text("CANCELAR")
+                }
+            }
+        )
     }
 }
 
@@ -187,7 +207,7 @@ fun CandidateCard(candidate: CandidateResult) {
     ) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
             Image(
-                painter = painterResource(id = if (candidate.imageRes != 0) candidate.imageRes else R.drawable.ic_school_logo),
+                painter = painterResource(id = if (candidate.imageRes != 0) candidate.imageRes else R.mipmap.ic_launcher_foreground),
                 contentDescription = null,
                 modifier = Modifier
                     .size(72.dp)
@@ -198,7 +218,6 @@ fun CandidateCard(candidate: CandidateResult) {
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
-                // Nombre del candidato - [cantidad votos] votos
                 val annotatedText = buildAnnotatedString {
                     append(candidate.name)
                     append(" - ")
@@ -220,7 +239,6 @@ fun CandidateCard(candidate: CandidateResult) {
                 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Barra de Progreso
                 Box(modifier = Modifier.fillMaxWidth().height(16.dp).clip(RoundedCornerShape(8.dp)).background(MaterialTheme.colorScheme.surfaceVariant)) {
                     Box(
                         modifier = Modifier
